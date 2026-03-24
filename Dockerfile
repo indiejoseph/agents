@@ -68,6 +68,8 @@ RUN bun install --frozen-lockfile
 
 FROM base AS builder
 
+ENV MASTRA_STUDIO_BASE_PATH=/agents
+
 COPY --from=install /app/node_modules ./node_modules
 COPY . .
 RUN npx mastra build --studio \
@@ -95,7 +97,6 @@ EXPOSE 4111
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD bun -e "fetch('http://localhost:4111/health').then(r=>process.exit(r.ok?0:1))"
 
-ENV MASTRA_STUDIO_BASE_PATH=/agents
 ENV MASTRA_STUDIO_PATH=/app/.mastra/output/studio
 ENV HOME=/workspace
 ENV PATH="/workspace/.local/bin:${PATH}"

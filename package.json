@@ -4,7 +4,7 @@
   "private": true,
   "description": "Cloudflare Containers messaging agent (WhatsApp bridge)",
   "scripts": {
-    "build": "mastra build",
+    "build": "mastra build --studio",
     "dev": "mastra dev",
     "format": "biome format --write .",
     "lint": "biome lint .",
