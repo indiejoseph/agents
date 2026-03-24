@@ -1,0 +1,41 @@
+services:
+  agent:
+    image: chat-agent:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:4111:4111"
+    volumes:
+      - ./workspace:/workspace
+    env_file:
+      - .env
+    environment:
+      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+      - AGENT_MODEL=${AGENT_MODEL:-gemini-3-flash-preview}
+      - AGENT_WORKSPACE=/workspace
+      - MEMORY_DB_PATH=/workspace/.db/agent.db
+      - PORT=4111
+      - MASTRA_HOST=0.0.0.0
+      - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:-}
+      - AGENT_GOOGLE_ACCOUNT=${AGENT_GOOGLE_ACCOUNT:-}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "fetch('http://localhost:4111/health').then(r=>process.exit(r.ok?0:1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - agent-network
+
+networks:
+  agent-network:
+    driver: bridge
