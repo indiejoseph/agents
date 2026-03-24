@@ -6,5 +6,4 @@ dist
 tmp
 workspace
 .mastra
-memory
 .cache
