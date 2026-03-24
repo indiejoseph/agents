@@ -72,7 +72,7 @@ ENV MASTRA_STUDIO_BASE_PATH=/agents
 
 COPY --from=install /app/node_modules ./node_modules
 COPY . .
-RUN npx mastra build --studio \
+RUN bun run build \
   && cd .mastra/output && npm install || true
 
 FROM base AS runner
