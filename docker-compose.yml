@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "127.0.0.1:4111:4111"
+      - "4111:4111"
     volumes:
       - ./workspace:/workspace
     env_file:
