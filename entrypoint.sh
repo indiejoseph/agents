@@ -4,36 +4,31 @@ set -eu
 WORKSPACE="${AGENT_WORKSPACE:-/workspace}"
 TEMPLATES_DIR="/app/templates"
 
-# 1. Get the UID/GID of the mounted host folder
-HOST_UID=$(stat -c '%u' "$WORKSPACE")
-HOST_GID=$(stat -c '%g' "$WORKSPACE")
+# 1. Get the UID of the mounted host folder
+TARGET_UID=$(stat -c '%u' "$WORKSPACE")
 
-# 2. Adjust 'appuser' to match the host IDs so they have 'owner' rights
-# We use 'usermod' and 'groupmod' (available in your debian-based image)
-if [ "$HOST_UID" != "0" ]; then
-    usermod -u "$HOST_UID" appuser
-    groupmod -g "$HOST_GID" appuser
+echo "Targeting Host UID: $TARGET_UID"
+
+# 2. Ensure the internal 'bun' user matches the Host UID
+# If they don't match, we'll just chown the workspace so 'bun' can write to it
+if [ "$TARGET_UID" != "1000" ]; then
+    echo "Host UID is $TARGET_UID. Adjusting workspace permissions..."
+    chown -R bun:bun "$WORKSPACE"
 fi
 
-# 3. Ensure the workspace is writable by appuser
-chown -R appuser:appuser "$WORKSPACE"
-
-if [ ! -d "$WORKSPACE" ]; then
-  mkdir -p "$WORKSPACE"
-fi
-
+# 3. Handle Template Initialization
 if [ -d "$TEMPLATES_DIR" ]; then
   for name in AGENTS.md HEARTBEAT.md IDENTITY.md SOUL.md USER.md; do
     if [ ! -f "$WORKSPACE/$name" ] && [ -f "$TEMPLATES_DIR/$name" ]; then
       cp "$TEMPLATES_DIR/$name" "$WORKSPACE/$name"
-      echo "Initialized $name in $WORKSPACE"
     fi
   done
-
+  
   if [ -d "$TEMPLATES_DIR/skills" ] && [ ! -d "$WORKSPACE/skills" ]; then
     cp -R "$TEMPLATES_DIR/skills" "$WORKSPACE/skills"
-    echo "Initialized skills in $WORKSPACE/skills"
   fi
+  # Ensure the newly copied templates are owned by bun
+  chown -R bun:bun "$WORKSPACE"
 fi
 
 exec "$@"

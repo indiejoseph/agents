@@ -88,8 +88,7 @@ COPY templates /app/templates
 COPY entrypoint.sh /entrypoint.sh
 
 RUN mkdir -p /workspace \
-  && useradd -m -d /workspace -s /bin/bash appuser \
-  && chown -R appuser:appuser /workspace \
+  && chown -R bun:bun /workspace \
   && chmod +x /entrypoint.sh
 
 EXPOSE 4111
@@ -102,7 +101,7 @@ ENV HOME=/workspace
 ENV PATH="/workspace/.local/bin:${PATH}"
 
 WORKDIR /workspace
-USER appuser
+USER root
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bun", "/app/.mastra/output/index.mjs"]
