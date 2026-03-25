@@ -5,8 +5,8 @@ import { assembleSystemPrompt } from "../identity/loader";
 import { getMCPTools } from "../mcp/client";
 import { createMemory, createStorage } from "../memory";
 import { getEnabledTools } from "../tools";
-import { getDynamicWorkspace } from "../workspace/workspace";
 import { resolveModel } from "./utils";
+import { getDynamicWorkspace } from "./workspace";
 
 const AGENT_MODEL = process.env.AGENT_MODEL as string;
 const IMAGE_VIEWER_MODEL =
